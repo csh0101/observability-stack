@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CURRENT_CTX=`kubectl config get-contexts|grep "\*" | awk '{ print $2 }'`
+CURRENT_CTX=`kubectl config get-contexts --kubeconfig ~/.kube/k3s.yaml |grep "\*" | awk '{ print $2 }'`
 echo Current Kubernetes context: ${CURRENT_CTX}
 
 git clone http://github.com/grafana/tns

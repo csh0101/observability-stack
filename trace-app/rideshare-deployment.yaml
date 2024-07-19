@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rideshare-deployment
+  labels:
+    app: rideshare
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rideshare
+  template:
+    metadata:
+      labels:
+        app: rideshare
+    spec:
+      containers:
+        - name: rideshare
+          image: csh0310/rideshare:alpha # 这里可以替换为你需要的镜像
+          imagePullPolicy: Always
+          env:
+            - name: "PYROSCOPE_SERVER_ADDRESS"
+              value: "http://pyroscope.pyroscope.svc.cluster.local:4040"
+            - name: "OTLP_URL"
+              value: "grafana-agent-traces.tempo.svc.cluster.local:4318"
+        - name: netshoot
+          image: nicolaka/netshoot
+          command: ["/bin/bash"]
+          args: ["-c", "while true; do ping localhost; sleep 60;done"]

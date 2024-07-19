@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverb-deployment
+  labels:
+    app: serverb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverb
+  template:
+    metadata:
+      labels:
+        app: serverb
+    spec:
+      containers:
+        - name: serverb
+          image: csh0310/tracing-serverb:alpha # 这里可以替换为你需要的镜像
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_ADDR 
+              value: "mysql.mysql.svc.cluster.local"
+          ports:
+          - containerPort: 8001
+
+

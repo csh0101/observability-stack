@@ -12,4 +12,5 @@
 helm repo add fluent https://fluent.github.io/helm-charts
 helm repo update
 helm upgrade --install fluent-bit fluent/fluent-bit \
+ --kubeconfig /home/csh0101/.kube/k3s.yaml \
     --values fluentbit-helm-values.yaml

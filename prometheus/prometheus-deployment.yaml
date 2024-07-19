@@ -32,6 +32,13 @@ spec:
       labels:
         name: prometheus
     spec:
+      initContainers:
+        - name: prometheus-data-permission-fix
+          image: busybox
+          command: ["/bin/chmod","-R","777", "/etc/prometheus/data"]
+          volumeMounts:
+          - name: prometheus-data
+            mountPath: /etc/prometheus/data
       containers:
         - image: quay.io/prometheus/prometheus:v2.40.4
           name: prometheus
@@ -39,6 +46,7 @@ spec:
             - "--storage.tsdb.retention.time=1h"
             - "--config.file=/etc/prometheus/cfg/prometheus.yaml"
             - "--storage.tsdb.path=/etc/prometheus/data/"
+            - "--enable-feature=remote-write-receiver"
           resources:
             requests:
               cpu: 200m

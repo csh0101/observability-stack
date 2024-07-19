@@ -7,5 +7,5 @@ metadata:
     app: minio
 data:
   MINIO_ROOT_USER: admin
-  MINIO_ROOT_PASSWORD: zaq1@WSX
+  MINIO_ROOT_PASSWORD: "12345678"
   MINIO_PROMETHEUS_AUTH_TYPE: public

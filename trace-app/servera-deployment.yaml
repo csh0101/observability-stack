@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servera-deployment
+  labels:
+    app: servera
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: servera
+  template:
+    metadata:
+      labels:
+        app: servera
+    spec:
+      containers:
+        - name: servera
+          image: csh0310/tracing-servera:alpha # 这里可以替换为你需要的镜像
+          imagePullPolicy: Always
+          env:
+            - name: "SERVERB_ADDR"
+              value: "serverb.trace-app.svc.cluster.local"
+        - name: netshoot
+          image: nicolaka/netshoot
+          command: ["/bin/bash"]
+          args: ["-c", "while true; do ping localhost; sleep 60;done"]

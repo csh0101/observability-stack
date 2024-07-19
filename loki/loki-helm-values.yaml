@@ -18,6 +18,16 @@
 # Section kubectlImage: No need to override.
 
 loki:
+  schemaConfig:
+    configs:
+      - from: 2024-04-01
+        object_store: s3
+        store: tsdb
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+  deploymentMode: SimpleScalable
   # Configures the readiness probe for all of the Loki pods
   readinessProbe:
     httpGet:
@@ -28,9 +38,9 @@ loki:
   image:
     registry: docker.io
     repository: grafana/loki
-    tag: main-2ff6f13 # Use fixed value
+    tag: 3.0.0 # Use fixed value
   # security settings are all default, and they should be kept: Don't
-  # use root user/group!
+  # use root user/grouggp!
   # -- The SecurityContext for Loki pods
   podSecurityContext:
     fsGroup: 10001
@@ -54,7 +64,8 @@ loki:
 
   # -- Limits config
   limits_config:
-    enforce_metric_name: false
+    # this params has been removed in loki3.0
+    #enforce_metric_name: false
     reject_old_samples: true
     reject_old_samples_max_age: 168h
     max_cache_freshness_per_query: 10m
@@ -68,16 +79,16 @@ loki:
   # -- Storage config. Providing this will automatically populate all necessary storage configs in the templated config.
   storage:
     bucketNames:
-      chunks: logsvol-chunks
-      ruler: logsvol-ruler
-      admin: logsvol-admin
+      chunks: loki-chunks
+      ruler: loki-rulers
+      admin: loki-admin
     type: s3
     s3:
       s3: null
       endpoint: http://minio.minio.svc.cluster.local:9000
       region: null
-      secretAccessKey: r4oLHOkXvw5MpL5TBltJIspT8Z7Pyrwl 
-      accessKeyId: LAiFfbGPznlcrPu3 
+      secretAccessKey: RNOGtL8lxEmJFlsGV0ZGHl7qdyyRNMuC 
+      accessKeyId: 3yHAZceelZT1rUdJ
       s3ForcePathStyle: true # Must be true to work with MinIO
       insecure: true
 
@@ -96,19 +107,6 @@ loki:
       service: "memcached-client"
       timeout: "500ms"
       default_validity: "12h"
-
-  # -- Check https://grafana.com/docs/loki/latest/configuration/#schema_config for more info on how to configure schemas
-  schemaConfig: {}
-
-  # -- Check https://grafana.com/docs/loki/latest/configuration/#ruler for more info on configuring ruler
-  rulerConfig: {}
-
-  # -- Structured loki configuration, takes precedence over `loki.config`, `loki.schemaConfig`, `loki.storageConfig`
-  structuredConfig: {}
-
-  # -- Additional query scheduler config
-  query_scheduler: {}
-
   # -- Additional storage config
   storage_config:
     hedging:
@@ -262,37 +260,37 @@ monitoring:
   # It will create custom resources for GrafanaAgent, LogsInstance, and PodLogs to configure
   # scrape configs to scrape it's own logs with the labels expected by the included dashboards.
   selfMonitoring:
-    enabled: true
+    enabled: false
 
     # -- Tenant to use for self monitoring
     tenant: "self-monitoring"
 
     # Grafana Agent configuration
-    grafanaAgent:
+    #grafanaAgent:
       # -- Controls whether to install the Grafana Agent Operator and its CRDs.
       # Note that helm will not install CRDs if this flag is enabled during an upgrade.
       # In that case install the CRDs manually from https://github.com/grafana/agent/tree/main/production/operator/crds
-      installOperator: false
+      #installOperator: false
       # -- Alternative namespace for Grafana Agent resources
-      namespace: loki
+      #namespace: loki
       # -- Grafana Agent annotations
-      annotations: {}
+      #annotations: {}
       # -- Additional Grafana Agent labels
-      labels: {}
+      #labels: {}
       # -- Enable the config read api on port 8080 of the agent
-      enableConfigReadAPI: false
+      #enableConfigReadAPI: false
 
     # PodLogs configuration
-    podLogs:
+    #podLogs:
       # -- Alternative namespace for PodLogs resources
-      namespace: loki
+      #namespace: loki
       # -- PodLogs annotations
-      annotations: {}
+      #annotations: {}
       # -- Additional PodLogs labels
-      labels: {}
+      #labels: {}
       # -- PodLogs relabel configs to apply to samples before scraping
       # https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
-      relabelings: []
+      #relabelings: []
 
     # LogsInstance configuration
     logsInstance:
@@ -337,7 +335,12 @@ write:
     # set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS, and OpenStack).
     storageClass: null
     # -- Selector for persistent disk
-    selector: null
+    selector: null 
+  #-- Annotations for pods
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "3100"
 
 # Configuration for the read node(s)
 read:
@@ -356,9 +359,16 @@ read:
     storageClass: null
     # -- Selector for persistent disk
     selector: null
+  #-- Annotations for pods
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "3100"
+
+
 
 # Configuration for the single binary node(s)
-singleBinary:
+backend:
   # -- Number of replicas for the single binary
   replicas: 1
   autoscaling:
@@ -374,6 +384,10 @@ singleBinary:
     storageClass: null
     # -- Selector for persistent disk
     selector: null
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "3100"
 
 # Use either this ingress or the gateway, but not both at once.
 # If you enable this, make sure to disable the gateway.

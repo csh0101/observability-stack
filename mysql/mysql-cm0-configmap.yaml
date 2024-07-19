@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  init.sql: |
+    CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY '123456';
+    GRANT ALL PRIVILEGES ON *.* TO 'test'@'%' WITH GRANT OPTION;
+    FLUSH PRIVILEGES;
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    io.kompose.service: mysql
+  name: mysql-cm0
+

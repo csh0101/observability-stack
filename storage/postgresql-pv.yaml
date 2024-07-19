@@ -5,14 +5,14 @@ metadata:
   namespace: postgresql
 spec:
   capacity:
-    storage: 1Gi
+    storage: 10Gi
   volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   storageClassName: local-storage
   local:
-    path: /home/fuzhouch/projects/learning/observability-stack/postgresql
+    path: /mnt/data/postgresql
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -20,4 +20,4 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - fcdvh01
+            - csh0101-omen-by-hp-laptop-15-ce0xx 

@@ -5,14 +5,14 @@ metadata:
   namespace: prometheus
 spec:
   capacity:
-    storage: 1Gi
+    storage: 10Gi
   volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   storageClassName: local-storage
   local:
-    path: /home/fuzhouch/projects/learning/observability-stack/prometheus
+    path: /mnt/data/prometheus
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -20,4 +20,4 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - fcdvh01
+            - csh0101-omen-by-hp-laptop-15-ce0xx
